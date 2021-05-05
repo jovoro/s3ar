@@ -9,7 +9,7 @@ I'm actually planning on using this to do some one-off backups of my files.
 
 ## Does it work?
 Sort of. I've implemented only the most basic things which are needed to handle multipart uploads with S3.
-That means that the feature set is pretty limited on my single use-case. Which I find to be quite OK.
+That means that the feature set is pretty limited to my single use-case. But I think that's quite OK, since there are many other tools to do all the other stuff.
 Also, I mugged an implementation of a Base64 encoder from the Internet and it doesn't seem to be an ideal solution.
 
 ## What do I need to build it?
