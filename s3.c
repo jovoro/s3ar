@@ -317,7 +317,7 @@ int s3_putpart(char *endpoint, char *bucket, char *aws_path, char *key, char *se
 	size_t etagstrlen = 0;
 	int ret = 0;
 
-	snprintf(getparms, BUFSIZ, "partNumber=%d&uploadId=%s", partnum, uploadid);
+	snprintf(getparms, BUFSIZ-1, "partNumber=%d&uploadId=%s", partnum, uploadid);
 	ret = s3_talk(endpoint, bucket, aws_path, "PUT", getparms, key, secret, "application/octet-stream", buffer, buflen, &etagstr, &etagstrlen); 
 
 	if(ret != 0) {
