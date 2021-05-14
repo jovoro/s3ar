@@ -438,6 +438,7 @@ int s3_completepart(char *endpoint, char *bucket, char *aws_path, char *key, cha
 	}
 	free(getparms);
 	free(buffer);
+	free(response);
 }
 
 size_t read_callback(char *dest, size_t size, size_t nmemb, void *userp) {
