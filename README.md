@@ -8,9 +8,10 @@ In turn, I was looking for a tool which I can pipe my tar output into. To my sur
 I'm actually planning on using this to do some one-off backups of my files. 
 
 ## Does it work?
-Sort of. I've implemented only the most basic things which are needed to handle multipart uploads with S3.
+After using it for a few days I can say that it works quite well. And after fixing the Base64 implementation it seems to do its job pretty reliably.
+I've implemented only the most basic things which are needed to handle multipart uploads with S3.
 That means that the feature set is pretty limited to my single use-case. But I think that's quite OK, since there are many other tools to do all the other stuff.
-Also, I mugged an implementation of a Base64 encoder from the Internet and it doesn't seem to be an ideal solution.
+I think what's left to do is to implement some options, e.g. to specify different chunk sizes. Also, it would be nice to be able to create checksums for the uploads.
 
 ## What do I need to build it?
 Curl and OpenSSL is required. Also you will want some kind of Make and, of course, a C compiler.
