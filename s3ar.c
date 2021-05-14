@@ -31,6 +31,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <openssl/sha.h>
 #include "s3.h"
 
 int main(int argc, char *argv[]) {
@@ -46,11 +47,14 @@ int main(int argc, char *argv[]) {
 	unsigned int i;
 	int ret = 1;
 	char *buffer;
-        size_t buflen;
-        struct ETag *et = NULL;
-        struct ETag *curr_et = NULL;
+	size_t buflen;
+	long long unsigned int bufsum = 0;
+	struct ETag *et = NULL;
+	struct ETag *curr_et = NULL;
 	short oktocomplete = 1;
 	int c;
+	SHA256_CTX sha256;
+	unsigned char hash[SHA256_DIGEST_LENGTH];
 
 	if(argc < 2) {
 		fprintf(stderr, "Missing aws_path (/foo.xyz)\n");
@@ -83,6 +87,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	s3_initpart(endpoint, bucket, argv[1], aws_key, aws_secret, &uploadId, &uploadIdLen);
+	SHA256_Init(&sha256);
 
 	if(uploadIdLen < 1 || uploadId == NULL) {
 		fprintf(stderr, "Cannot get upload ID.\n");
@@ -114,6 +119,7 @@ int main(int argc, char *argv[]) {
 				if(ret == 0)
 					break;
 			}
+
 			if(i >= 3) {
 				fprintf(stderr, "Failed upload of part %d three times, giving up.\n", partnum);
 				exit(EXIT_FAILURE);
@@ -132,11 +138,14 @@ int main(int argc, char *argv[]) {
                         curr_et->partnum = partnum;
                         curr_et->buffer = responsehdr;
                         curr_et->buflen = rhlen;
+			SHA256_Update(&sha256, buffer, buflen);
 			responsehdr = NULL;
 			rhlen = 0;
+			bufsum += buflen;
                 }
         }
 
+	SHA256_Final(hash, &sha256);
 	free(buffer);
 
         for(i=0; i<partnum; i++) {
@@ -152,12 +161,16 @@ int main(int argc, char *argv[]) {
 			exit(EXIT_FAILURE);
 	}
 
-	sleep(S3_UPLOAD_RETRY_WAIT);
 	s3_completepart(endpoint, bucket, argv[1], aws_key, aws_secret, uploadId, et, partnum);
+	fprintf(stderr, "\nTransferred %llu bytes\nSHA256: ", bufsum);
 
-	
+	for(i = 0; i < SHA256_DIGEST_LENGTH; i++)
+	{
+		fprintf(stderr, "%02x", hash[i]);
+	}
 
-        free(et);
+	fprintf(stderr, "\n");
+	free(et);
 	free(uploadId);
 	uploadId = NULL;
 }
