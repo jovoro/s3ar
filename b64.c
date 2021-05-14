@@ -1,8 +1,35 @@
-    /***********************************************************
-    * Base64 library implementation                            *
-    * @author Ahmed Elzoughby                                  *
-    * @date July 23, 2017                                      *
-    ***********************************************************/
+/* Copyright (c) 2021 J. von Rotz <jr@vrtz.ch>
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived
+ * from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+ * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER
+ * OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/* This base64 implementation is based on work of Ahmed Elzoughby.
+ * Copyright (c) 2017 Ahmed Elzoughby
+ */
 
 #include <stdlib.h>
 #include <memory.h>
@@ -15,14 +42,14 @@ char base46_map[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
                      'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'};
 
 
-char* base64_encode(char* plain) {
+char* base64_encode(char* plain, size_t plainsiz) {
 
     char counts = 0;
     unsigned char buffer[3];
-    char* cipher = malloc(strlen(plain) * 4 / 3 + 4);
+    char* cipher = malloc(plainsiz * 4 / 3 + 4 + 1);
     int i = 0, c = 0;
 
-    for(i = 0; plain[i] != '\0'; i++) {
+    for(i = 0; i < plainsiz; i++) {
         buffer[counts++] = plain[i];
         if(counts == 3) {
             cipher[c++] = base46_map[buffer[0] >> 2];
@@ -45,19 +72,19 @@ char* base64_encode(char* plain) {
         cipher[c++] = '=';
     }
 
-    cipher[c] = '\0';   /* string padding character */
+    cipher[c] = '\0';
     return cipher;
 }
 
 
-char* base64_decode(char* cipher) {
+char* base64_decode(char* cipher, size_t ciphersiz) {
 
     char counts = 0;
     char buffer[4];
-    char* plain = malloc(strlen(cipher) * 3 / 4);
+    char* plain = malloc(ciphersiz * 3 / 4 + 1);
     int i = 0, p = 0;
 
-    for(i = 0; cipher[i] != '\0'; i++) {
+    for(i = 0; i < ciphersiz; i++) {
         char k;
         for(k = 0 ; k < 64 && base46_map[k] != cipher[i]; k++);
         buffer[counts++] = k;
@@ -71,6 +98,6 @@ char* base64_decode(char* cipher) {
         }
     }
 
-    plain[p] = '\0';    /* string padding character */
+    plain[p] = '\0';
     return plain;
 }

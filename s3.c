@@ -174,7 +174,7 @@ int s3_talk(char *endpoint, char *bucket, char *aws_path, char *method, char *ge
 	fprintf(stderr, " -- s3_talk: Contents of m:\n%s\n -- s3_talk: End contents of m\n\n", m);
 #endif
 	HMAC(EVP_sha1(), secret, strlen(secret), m, strlen(m), md, &md_len);
-	b64str = base64_encode(md);
+	b64str = base64_encode(md, md_len);
 	snprintf(authhdr, BUFSIZ, "Authorization: AWS %s:%s", key, b64str);
 	res = curl_global_init(CURL_GLOBAL_DEFAULT);
 	
@@ -431,7 +431,8 @@ int s3_completepart(char *endpoint, char *bucket, char *aws_path, char *key, cha
 #ifdef S3ARDEBUG
 	fprintf(stderr, " -- s3_completepart: Content of buffer:\n%s\n -- s3_completepart: End of content of buffer\n\n", buffer);
 #endif
-	ret = s3_talk(endpoint, bucket, aws_path, "POST", getparms, key, secret, "multipart/form-data;", buffer, buflen-1, &response, &responselen); /* buflen -1: We are transferring raw bytes, so terminating NULL character would be included, which results in a malformed XML */
+	/* buflen -1: We are transferring raw bytes, so terminating NULL character would be included, which results in a malformed XML */
+	ret = s3_talk(endpoint, bucket, aws_path, "POST", getparms, key, secret, "multipart/form-data;", buffer, buflen-1, &response, &responselen); 
 	if(ret != 0) {
 		fprintf(stderr, "Failed to send MultipartUploadComplete request, you might want to send it manually again. See above output for ETags for each part number.\n");
 	}
