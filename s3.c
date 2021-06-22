@@ -125,16 +125,6 @@ int s3_talk(char *endpoint, char *bucket, char *aws_path, char *method, char *ge
 	struct ResponseBuffer resbuf;
 	resbuf.size = 0;
 
-#ifdef S3ARDEBUG
-	/*
-	fprintf(stderr, " -- s3_talk: Content of buffer (%d bytes):\n", buflen);
-	for (int i = 0; i < buflen; i++) {
-		printf(" %02x", (unsigned char)buffer[i]);
-	}
-	fprintf(stderr, "\n -- s3_talk: End of content of buffer\n\n");
-	*/ 
-#endif
-
 	bytes_free = BUFSIZ;
 	strncpy(pathstr, aws_path, BUFSIZ-1);
 	pathstr[BUFSIZ-1] = '\0';
